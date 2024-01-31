@@ -9,6 +9,7 @@ class Walls {
   void update() {
     stroke(255); 
     strokeWeight(1);
+    
     line(this.wall_src.x, this.wall_src.y, this.wall_end.x, this.wall_end.y);
   }
   

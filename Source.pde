@@ -3,14 +3,15 @@ class Source {
   PVector ray_src;
   PVector[] ray_end;
   
-  int ray_cnt = 100;
+  int ray_cnt = 120;
   
   float ray_len = sqrt(width*width + height*height + 10); // bigger than diagonal
+  float[] final_ray_len;
   
-  float FOV = PI/4;
+  float FOV = PI/2;
   
   float view_angle = 0;
-  
+  float camera_speed = 2;
   Walls[] walls;
   
   
@@ -24,6 +25,11 @@ class Source {
     }
     
      this.walls = walls;
+     this.final_ray_len = new float[ray_cnt];
+     
+     this.ray_src.x = width/4;
+     this.ray_src.y = height/2;
+    
     
   }
   
@@ -63,18 +69,8 @@ class Source {
      return dist;
   }
   
-  
-  
-  
-  void update() {
-    this.ray_src.x = mouseX;
-    this.ray_src.y = mouseY;
-    
-    // Rays    
-    strokeWeight(1);
-    stroke(255, 125);
-    float angle = view_angle;
-    
+  void src_movement() {
+    // Camera turning
     if(keyPressed && (key == 'd' || key == 'D')) {
       this.view_angle += 0.05;
     }
@@ -82,6 +78,41 @@ class Source {
       this.view_angle -= 0.05;
     }
     
+    int center = int(ray_cnt/2);
+    PVector dir = new PVector(0, 0);
+    dir.x = final_ray_len[center]*cos(this.view_angle + (this.FOV/this.ray_cnt)*center);
+    dir.y = final_ray_len[center]*sin(this.view_angle + (this.FOV/this.ray_cnt)*center);
+    dir.normalize();
+    dir.setMag(camera_speed);
+    
+    // Camera movement
+    if(keyPressed && (key == 'w' || key == 'W')) {
+      this.ray_src.x += dir.x;
+      this.ray_src.y += dir.y;
+    }
+    else if(keyPressed && (key == 's' || key == 'S')) {
+      this.ray_src.x -= dir.x;
+      this.ray_src.y -= dir.y;
+    }
+    
+     //this.ray_src.x = mouseX;
+     //this.ray_src.y = mouseY;
+    
+     // Add wall collision, will have to check reverse with all walls as well. Maybe just add a reverse ray
+    
+  }
+  
+  
+  void update() {
+    
+    
+    // Rays    
+    strokeWeight(5);
+    stroke(255, 255);
+    float angle = view_angle;
+    
+    
+    src_movement();
     
     
     for(int i = 0; i < this.ray_end.length; i++) {
@@ -102,9 +133,11 @@ class Source {
       this.ray_end[i].x = this.ray_src.x + min_dist*cos(angle);
       this.ray_end[i].y = this.ray_src.y + min_dist*sin(angle);
       
+      final_ray_len[i] = min_dist;
+      
       // Draw rays
       line(this.ray_src.x, this.ray_src.y, this.ray_end[i].x, this.ray_end[i].y);
-      angle += (FOV/ray_cnt);
+      angle += (this.FOV/this.ray_cnt);
       
       
     }    
