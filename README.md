@@ -2,4 +2,4 @@ Basic 2D raycasting implemented in Processing, inspired by the Coding Train vide
 
 Use the W A S D to move the src. 
 
-![](RayCastingScreenshot.png)
+![](RayCasting_Screenshot.png)
